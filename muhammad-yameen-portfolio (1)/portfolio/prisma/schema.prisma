@@ -1,0 +1,110 @@
+// Prisma schema — targets a cloud Postgres database (Neon / Vercel Postgres / Supabase).
+// Large media (videos, images) is NOT stored here — only URLs pointing at Vercel Blob.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Singleton row holding all editable site-wide text/content.
+model SiteSettings {
+  id Int @id @default(1)
+
+  // General info
+  name         String @default("Muhammad Yameen")
+  age          Int    @default(19)
+  email        String @default("wolvessmm.com@gmail.com")
+  phone        String @default("03212240750")
+  bio          String @default("I create AI-powered Claymation videos, cinematic visual content and modern web applications.")
+
+  // Hero
+  heroTagline     String @default("AI Video Creator & Software Developer")
+  heroDescription String @default("Creating AI-powered Claymation videos, creative visual content and modern web applications.")
+
+  // About
+  aboutHeading String @default("About Muhammad")
+  aboutBody    String @default("I'm a 19-year-old AI video creator and software developer. My work lives at the intersection of AI-generated Claymation storytelling and modern, high-performance web applications — I build the visuals people remember and the software that ships them.")
+
+  // Section titles
+  videosSectionTitle   String @default("AI Video Creation & Claymation")
+  projectsSectionTitle String @default("Selected Projects")
+  skillsSectionTitle   String @default("Craft & Tools")
+
+  // Images (Vercel Blob URLs)
+  profileImageUrl String?
+  logoUrl         String?
+
+  updatedAt DateTime @updatedAt
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String   @default("Claymation")
+  aiTools     String[] @default([])
+  date        DateTime @default(now())
+
+  videoUrl     String
+  thumbnailUrl String?
+
+  published Boolean @default(true)
+  order     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  technologies String[] @default([])
+  imageUrl     String?
+  liveUrl      String?
+  githubUrl    String?
+
+  published Boolean @default(true)
+  order     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+model Skill {
+  id         String @id @default(cuid())
+  name       String
+  percentage Int    @default(50)
+  logoUrl    String?
+
+  published Boolean @default(true)
+  order     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+enum SocialPlatform {
+  GITHUB
+  LINKEDIN
+  INSTAGRAM
+  YOUTUBE
+  TIKTOK
+  WHATSAPP
+}
+
+model SocialLink {
+  id       String         @id @default(cuid())
+  platform SocialPlatform @unique
+  url      String?
+}
